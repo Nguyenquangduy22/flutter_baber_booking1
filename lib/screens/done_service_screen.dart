@@ -17,6 +17,7 @@ import 'package:flutter_baber_taolaymay/model/booking_model.dart';
 import 'package:flutter_baber_taolaymay/model/service_model.dart';
 
 import 'package:flutter_baber_taolaymay/state/state_management.dart';
+import 'package:flutter_baber_taolaymay/utils/utils.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -92,15 +93,21 @@ class DoneService extends ConsumerWidget{
                                 ],
                                 ),
                                 Divider(thickness: 2,),
-                                Row(children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                                  children: [
                                   Consumer(builder: (context,watch,_){
                                     var servicesSelected = watch(selectedServices).state;
                                     var totalPrice = servicesSelected.map((item) => item.price)
                                     .fold(0, (value, element) => value + element);
-                                    return Text('Price $totalPrice\VND',style: GoogleFonts.robotoMono(fontSize: 22),);
-                                  },)
+                                    return Text('Price ${context.read(selectedBooking).state.totalPrice == 0 ? totalPrice : context.read(selectedBooking).state.totalPrice}\VND',style: GoogleFonts.robotoMono(fontSize: 22),);
+                                  },),
+                                    context.read(selectedBooking).state.done ? Chip(label: Text('Finished'),) : Container()
 
-                                ],)
+
+                                ],),
+
                               ],
                             ),
                           ),
@@ -143,7 +150,10 @@ class DoneService extends ConsumerWidget{
                                 Container(
                                   width: MediaQuery.of(context).size.width,
                                   child: ElevatedButton(
-                                    onPressed: servicesWatch.length > 0 ? () => finishService(context) : null,
+                                    onPressed: context.read(selectedBooking).state.done ? null :
+                                    servicesWatch.length > 0
+                                        ? () => finishService(context)
+                                        : null ,
                                     child: Text('FINISH',style : GoogleFonts.robotoMono()),
                                   ),
                                 )
@@ -175,8 +185,12 @@ class DoneService extends ConsumerWidget{
         .doc('${barberBook.barberId}_${DateFormat('dd_MM_yyyy').format(
         DateTime.fromMillisecondsSinceEpoch(barberBook.timeStamp))}');
 
-    Map<String,bool> updateDone = new Map();
+    Map<String,dynamic> updateDone = new Map();
     updateDone['done'] = true;
+    updateDone['services'] =
+        convertServices(context.read(selectedServices).state);
+    updateDone['totalPrice'] = context.read(selectedServices).state
+    .map((e)=>e.price).fold(0, (previousValue, element) => previousValue + element);
 
     batch.update(userBook, updateDone);
     batch.update(barberBook.reference, updateDone);

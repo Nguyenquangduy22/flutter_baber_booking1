@@ -145,7 +145,9 @@ class UserHistory extends ConsumerWidget {
                                       ],
                                     ),
                                   ),
-                                  GestureDetector(onTap: isExpried ? null : () {
+                                  GestureDetector(
+                                    onTap:  (userBookings[index].done || isExpried )
+                                        ? null : () {
                                     Alert(
                                         context: context,
                                         type: AlertType.warning,

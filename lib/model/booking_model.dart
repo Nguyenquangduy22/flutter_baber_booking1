@@ -13,7 +13,10 @@ class BookingModel{
   salonAddress,
   salonId,
   salonName,
+  services,
   time;
+
+  double totalPrice;
   bool done;
   int slot , timeStamp;
 
@@ -25,6 +28,8 @@ class BookingModel{
       this.barberName,
       this.cityBook,
         this.customerId,
+        this.services,
+        this.totalPrice,
       this.customerName,
       this.customerPhone,
       this.salonAddress,
@@ -40,6 +45,7 @@ class BookingModel{
     barberName = json['barberName'];
     cityBook = json['cityBook'];
     customerId = json['customerId'];
+    services = json['services'];
     customerName = json['customerName'];
     customerPhone = json['customerPhone'];
     salonAddress = json['salonAddress'];
@@ -48,6 +54,7 @@ class BookingModel{
     time = json['time'];
     done = json['done']  as bool;
     slot = int.parse(json['slot'] == null ? '-1' : json['slot'].toString());
+    totalPrice = double.parse(json['totalPrice'] == null ? '0' : json['totalPrice'].toString());
     timeStamp = int.parse(json['timeStamp'] == null ? '0' : json['timeStamp'].toString() );
   }
   Map<String ,dynamic> toJson(){
