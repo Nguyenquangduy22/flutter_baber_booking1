@@ -1,11 +1,13 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+
 class BookingModel{
   String docId,
   barberId,
   barberName,
   cityBook,
+  customerId,
   customerName,
   customerPhone,
   salonAddress,
@@ -22,6 +24,7 @@ class BookingModel{
       this.barberId,
       this.barberName,
       this.cityBook,
+        this.customerId,
       this.customerName,
       this.customerPhone,
       this.salonAddress,
@@ -36,6 +39,7 @@ class BookingModel{
     barberId = json['barberId'];
     barberName = json['barberName'];
     cityBook = json['cityBook'];
+    customerId = json['customerId'];
     customerName = json['customerName'];
     customerPhone = json['customerPhone'];
     salonAddress = json['salonAddress'];
@@ -51,8 +55,9 @@ class BookingModel{
     data['barberId'] = this.barberId;
     data['barberName'] = this.barberName;
     data['cityBook'] = this.cityBook;
+    data['customerId'] = this.customerId;
     data['customerName'] = this.customerName;
-    data[' customerPhone'] = this. customerPhone;
+    data['customerPhone'] = this. customerPhone;
     data['salonAddress'] = this.salonAddress;
     data['salonName'] = this.salonName;
     data['salonId'] = this.salonId;

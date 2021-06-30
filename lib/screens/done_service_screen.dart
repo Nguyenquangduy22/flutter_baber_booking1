@@ -3,25 +3,21 @@
 
 
 
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:chips_choice/chips_choice.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_baber_taolaymay/cloud_firestore/all_salon_ref.dart';
-import 'package:flutter_baber_taolaymay/cloud_firestore/banner_ref.dart';
-import 'package:flutter_baber_taolaymay/cloud_firestore/lookbook_ref.dart';
+
 import 'package:flutter_baber_taolaymay/cloud_firestore/services_ref.dart';
-import 'package:flutter_baber_taolaymay/cloud_firestore/user_ref.dart';
+
 import 'package:flutter_baber_taolaymay/model/booking_model.dart';
-import 'package:flutter_baber_taolaymay/model/city_model.dart';
-import 'package:flutter_baber_taolaymay/model/image_model.dart';
-import 'package:flutter_baber_taolaymay/model/salon_model.dart';
+
 import 'package:flutter_baber_taolaymay/model/service_model.dart';
-import 'package:flutter_baber_taolaymay/model/user_model.dart';
+
 import 'package:flutter_baber_taolaymay/state/state_management.dart';
-import 'package:flutter_baber_taolaymay/utils/utils.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -29,6 +25,7 @@ import 'package:intl/intl.dart';
 
 
 class DoneService extends ConsumerWidget{
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
   @override
   Widget build(BuildContext context, watch) {
     //When refresh , clear servicesSelected , boi vi Chip Choices not hold state
@@ -36,6 +33,7 @@ class DoneService extends ConsumerWidget{
 
     return SafeArea(
         child: Scaffold(
+          key : scaffoldKey,
           resizeToAvoidBottomInset: true,
           backgroundColor: Color(0xFFDFDFDF),
           body: Center(
@@ -167,6 +165,29 @@ class DoneService extends ConsumerWidget{
   }
 
   finishService(BuildContext context) {
+    var batch = FirebaseFirestore.instance.batch();
+    var barberBook = context.read(selectedBooking).state;
+
+    var userBook = FirebaseFirestore.instance
+        .collection('user')
+        .doc('${barberBook.customerPhone}')
+        .collection('Booking_${barberBook.customerId}')
+        .doc('${barberBook.barberId}_${DateFormat('dd_MM_yyyy').format(
+        DateTime.fromMillisecondsSinceEpoch(barberBook.timeStamp))}');
+
+    Map<String,bool> updateDone = new Map();
+    updateDone['done'] = true;
+
+    batch.update(userBook, updateDone);
+    batch.update(barberBook.reference, updateDone);
+
+    batch.commit().then((value) {
+      ScaffoldMessenger.of(scaffoldKey.currentContext)
+          .showSnackBar(SnackBar(content: Text('Process success'))).closed
+          .then((v) => Navigator.of(context).pop());
+
+    });
+
 
   }
 

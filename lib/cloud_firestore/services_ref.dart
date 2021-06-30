@@ -8,8 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 Future<List<ServiceModel>> getServices(BuildContext context) async{
   var services = List<ServiceModel>.empty(growable: true);
   CollectionReference serviceRef = FirebaseFirestore.instance.collection('services');
-  QuerySnapshot snapshot = await serviceRef
-      .where(context.read(selectedSalon).state.docId, isEqualTo: true)
+  QuerySnapshot snapshot = await serviceRef.where(
+      context.read(selectedSalon).state.docId, isEqualTo: true)
       .get();
   snapshot.docs.forEach((element) {
     var serviceModel = ServiceModel.fromJson(element.data());

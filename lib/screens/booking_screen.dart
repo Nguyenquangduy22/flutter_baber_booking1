@@ -359,7 +359,8 @@ class BookingScreen extends ConsumerWidget{
   confirmBooking(BuildContext context) {
       var hour = context
           .read(selectedTime)
-          .state.length <= 10 ? int.parse(context
+          .state.length <= 10
+          ? int.parse(context
           .read(selectedTime)
           .state.split(':')[0]
           .substring(0,1)) :
@@ -372,16 +373,10 @@ class BookingScreen extends ConsumerWidget{
        // minutes
       var minutes = context
         .read(selectedTime)
-        .state.length <= 10 ? int.parse(context
-        .read(selectedTime)
-        .state.split(':')[1]
-        .substring(0,1)) :
+        .state.length <= 10 ?
+      int.parse(context.read(selectedTime).state.split(':')[1].substring(0,1)) :
 
-    int.parse(context
-        .read(selectedTime)
-        .state
-        .split(':')[1]
-        .substring(0,2)); // hour
+      int.parse(context.read(selectedTime).state.split(':')[1].substring(0,2)); // hour
 
       var timeStamp = DateTime(
       context.read(selectedDate).state.year,
@@ -396,6 +391,7 @@ class BookingScreen extends ConsumerWidget{
           barberId : context.read(selectedBarber).state.docId,
           barberName : context.read(selectedBarber).state.name,
           cityBook : context.read(selectedCity).state.name,
+          customerId : FirebaseAuth.instance.currentUser.uid,
           customerName : context.read(userInformation).state.name,
           customerPhone : FirebaseAuth.instance.currentUser.phoneNumber,
           done : false,
@@ -407,20 +403,9 @@ class BookingScreen extends ConsumerWidget{
           time : '${context.read(selectedTime).state} - ${DateFormat('dd/MM/yyyy').format(context.read(selectedDate).state)}'
       );
 
-    var submitData = {
-      'barberId' : context.read(selectedBarber).state.docId,
-      'barberName' : context.read(selectedBarber).state.name,
-      'cityBook' : context.read(selectedCity).state.name,
-      'customerName' : context.read(userInformation).state.name,
-      'customerPhone' : FirebaseAuth.instance.currentUser.phoneNumber,
-      'done' : false,
-      'salonAddress' : context.read(selectedSalon).state.address,
-      'salonId' : context.read(selectedSalon).state.docId,
-      'salonName' : context.read(selectedSalon).state.name,
-      'slot' :context.read(selectedTimeSlot).state,
-      'timeStamp' : timeStamp,
-      'time' : '${context.read(selectedTime).state} - ${DateFormat('dd/MM/yyyy').format(context.read(selectedDate).state)}'
-    };
+      
+
+
 
     var batch = FirebaseFirestore.instance.batch();
 
@@ -435,7 +420,8 @@ class BookingScreen extends ConsumerWidget{
     DocumentReference userBooking = FirebaseFirestore.instance.collection('user')
     .doc(FirebaseAuth.instance.currentUser.phoneNumber)
     .collection('Booking_${FirebaseAuth.instance.currentUser.uid}') // For secure info
-    .doc();
+    .doc('${context.read(selectedBarber).state.docId}_${DateFormat('dd_MM_yyyy')
+        .format(context.read(selectedDate).state)}');
 
     // Set for batch
     batch.set(barberBooking, bookingModel.toJson());
